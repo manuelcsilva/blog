@@ -210,7 +210,7 @@
             <img src="<%= post.imagem %>" alt="Imagem do post" width="419.33" height="225" />
             <div class="card-body">
               <p><strong><%= post.titulo %></strong></p>
-              <p class="card-text"><%= post.texto.split(' ').slice(0, 25).join(' ') %> ...</p>
+              <p class="card-text"><%- post.texto.split(' ').slice(0, 25).join(' ') %> ...</p>
               <div class="d-flex justify-content-between align-items-center">
                 <div class="btn-group">
                   <button type="button" class="btn btn-sm btn-outline-secondary"><a href="/view/<%= post.id %>">View</a></button>

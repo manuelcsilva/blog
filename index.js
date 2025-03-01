@@ -3,6 +3,7 @@ const ejs = require("ejs");
 const connectToDatabase = require("./src/database/connect");
 const PostsModel = require("./src/models/posts.model");
 const bodyParser = require("body-parser");
+const sanitizeHtml = require("sanitize-html");
 
 connectToDatabase();
 
@@ -38,8 +39,14 @@ app.get("/admin", async (req, res) => {
 
 app.post("/admin", async (req, res) => {
   try {
-    const post = await PostsModel.create(req.body);
+    const clean = {
+      titulo: sanitizeHtml(req.body.titulo),
+      texto: sanitizeHtml(req.body.texto),
+      imagem: sanitizeHtml(req.body.imagem),
+    };
     console.log(req.body);
+    console.log(clean);
+    const post = await PostsModel.create(clean);
 
     res.redirect("./admin");
   } catch (error) {
@@ -60,33 +67,35 @@ app.get("/view/:id", async (req, res) => {
 });
 
 app.get("/edit/:id", async (req, res) => {
-    try {
-      const id = req.params.id;
-      const post = await PostsModel.findById(id);
-  
-      res.render("edit", { post });
-    } catch (error) {
-      res.status(500).send(error.message);
-    }
-  });
+  try {
+    const id = req.params.id;
+    const post = await PostsModel.findById(id);
+
+    res.render("edit", { post });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 app.post("/edit/:id", async (req, res) => {
-    try {
-      const id = req.params.id;
-      const post = await PostsModel.findByIdAndUpdate(id, req.body, { new: true });
-  
-      res.status(201).redirect("/")
-    } catch (error) {
-      res.status(500).send(error.message);
-    }
-  });
+  try {
+    const id = req.params.id;
+    const post = await PostsModel.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+
+    res.status(201).redirect("/");
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 
 app.get("/delete/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const post = await PostsModel.findByIdAndDelete(id);
 
-    res.redirect("/");
+    res.redirect("/posts");
   } catch (error) {
     res.status(500).send(error.message);
   }
